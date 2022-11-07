@@ -45,18 +45,22 @@ example : ∀ m n : nat, even n → even (m * n) :=
 example : ∀ m n : nat, even n → even (m * n) :=
 begin
   -- say m and n are natural numbers, and assume n=2*k
-  rintros m n ⟨k, hk⟩,
+  rintro m n ⟨k, hk⟩,
   -- We need to prove m*n is twice a natural. Let's show it's twice m*k.
   use m * k,
   -- substitute in for n
   rw hk,
   -- and now it's obvious
-  ring
+  ring,
 end
 
 example : ∀ m n : nat, even n → even (m * n) :=
-by { rintros m n ⟨k, hk⟩, use m * k, rw hk, ring }
+begin
+  by { rintros m n ⟨k, hk⟩, use m * k, rw hk, ring }
+end
 
 example : ∀ m n : nat, even n → even (m * n) :=
-by intros; simp * with parity_simps
+begin
+  by intros; simp * with parity_simps,
+end
 

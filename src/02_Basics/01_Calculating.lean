@@ -6,19 +6,21 @@ import data.real.basic
 example (a b c : ℝ) : (a * b) * c = b * (a * c) :=
 begin
   rw mul_comm a b,
-  rw mul_assoc b a c
+  rw mul_assoc b a c,
 end
 
 /- Try these.-/
 
 example (a b c : ℝ) : (c * b) * a = b * (a * c) :=
 begin
-  sorry
+  rw ←  mul_assoc b a c,
+  rw mul_assoc c b a,
+  rw mul_comm,
 end
 
 example (a b c : ℝ) : a * (b * c) = b * (a * c) :=
 begin
-  sorry
+  ring,
 end
 
 /- An example. -/
@@ -26,7 +28,7 @@ end
 example (a b c : ℝ) : a * b * c = b * c * a :=
 begin
   rw mul_assoc,
-  rw mul_comm
+  rw mul_comm,
 end
 
 /- Try doing the first of these without providing any arguments at all,
@@ -34,7 +36,7 @@ end
 
 example (a b c : ℝ) : a * (b * c) = b * (c * a) :=
 begin
-  sorry
+  ring,
 end
 
 example (a b c : ℝ) : a * (b * c) = b * (a * c) :=
@@ -189,4 +191,5 @@ begin
   nth_rewrite 1 h,
   rw add_mul
 end
+
 
