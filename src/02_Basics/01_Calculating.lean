@@ -13,7 +13,7 @@ end
 
 example (a b c : ℝ) : (c * b) * a = b * (a * c) :=
 begin
-  rw ←  mul_assoc b a c,
+  rw ← mul_assoc b a c,
   rw mul_assoc c b a,
   rw mul_comm,
 end
@@ -41,7 +41,7 @@ end
 
 example (a b c : ℝ) : a * (b * c) = b * (a * c) :=
 begin
-  sorry
+  ring,
 end
 
 /- Using facts from the local context. -/
@@ -50,7 +50,7 @@ example (a b c d e f : ℝ) (h : a * b = c * d) (h' : e = f) :
   a * (b * e) = c * (d * f) :=
 begin
   rw h',
-  rw ←mul_assoc,
+  rw ← mul_assoc,
   rw h,
   rw mul_assoc
 end
@@ -60,12 +60,20 @@ end
 example (a b c d e f : ℝ) (h : b * c = e * f) :
   a * b * c * d = a * e * f * d :=
 begin
-  sorry
+  rw mul_assoc a, 
+  rw h,
+  rw ← mul_assoc a,
 end
 
 example (a b c d : ℝ) (hyp : c = b * a - d) (hyp' : d = a * b) : c = 0 :=
 begin
-  sorry
+  /- rw hyp, -/
+  /- rw mul_comm, -/
+  /- rw ← hyp', -/
+  /- rw sub_self, -/
+
+  rw [hyp, mul_comm, ← hyp', sub_self],
+  /- by {rw hyp, rw mul_comm, rw ← hyp', rw sub_self,} -/
 end
 
 /- Examples. -/
@@ -84,12 +92,13 @@ by rw [h', ←mul_assoc, h, mul_assoc]
 
 end
 
+
 section
 variables a b c : ℝ
 
 #check a
 #check a + b
-#check (a : ℝ)
+#check (a : ℝ )
 #check mul_comm a b
 #check (mul_comm a b : a * b = b * a)
 #check mul_assoc c a b
@@ -137,11 +146,11 @@ section
 variables a b c d : ℝ
 
 example : (a + b) * (c + d) = a * c + a * d + b * c + b * d :=
-sorry
+by ring
 
 example (a b : ℝ) : (a + b) * (a - b) = a^2 - b^2 :=
 begin
-  sorry
+  ring,
 end
 
 #check pow_two a

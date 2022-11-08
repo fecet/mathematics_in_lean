@@ -14,6 +14,12 @@ variables (R : Type*) [ring R]
 #check (one_mul : ∀ a : R, 1 * a = a)
 #check (mul_add : ∀ a b c : R, a * (b + c) = a * b + a * c)
 #check (add_mul : ∀ a b c : R, (a + b) * c = a * c + b * c)
+variables a b c:R
+#check mul_add a b c
+
+example: ∀ a b c : R, a * (b + c) = a * b + a * c:=
+by exact mul_add
+
 end
 
 section
@@ -107,7 +113,7 @@ end
 theorem neg_zero : (-0 : R) = 0 :=
 begin
   apply neg_eq_of_add_eq_zero,
-  rw add_zero
+  rw add_zero,
 end
 
 theorem neg_neg (a : R) : -(-a) = a :=
@@ -138,14 +144,18 @@ namespace my_ring
 
 variables {R : Type*} [ring R]
 
-theorem self_sub (a : R) : a - a = 0 :=
-sorry
+theorem self_sub (a : R) : a - a = 0 := 
+by rw sub_self
 
 lemma one_add_one_eq_two : 1 + 1 = (2 : R) :=
 by refl
 
 theorem two_mul (a : R) : 2 * a = a + a :=
-sorry
+begin
+  rw ← one_add_one_eq_two,
+  rw add_mul,
+  rw one_mul,
+end
 
 end my_ring
 
@@ -154,7 +164,6 @@ variables (A : Type*) [add_group A]
 
 #check (add_assoc : ∀ a b c : A, a + b + c = a + (b + c))
 #check (zero_add : ∀ a : A, 0 + a = a)
-#check (mul_assoc : ∀ a b c : A, a * b * c = a * (b * c))
 #check (add_left_neg : ∀ a : A, -a + a = 0)
 end
 
@@ -168,13 +177,31 @@ variables {G : Type*} [group G]
 namespace my_group
 
 theorem mul_right_inv (a : G) : a * a⁻¹ = 1 :=
-sorry
+begin
+  have h : (a * a⁻¹)⁻¹ * ((a * a⁻¹) * (a * a⁻¹)) = 1,
+  { rw [mul_assoc, ←mul_assoc a⁻¹ a, mul_left_inv, one_mul, mul_left_inv] },
+  rw [←h, ←mul_assoc, mul_left_inv, one_mul],
+end
 
 theorem mul_one (a : G) : a * 1 = a :=
-sorry
+begin
+  have h: a * a⁻¹ * a = a,
+  {by rw [mul_right_inv, one_mul]},
+  rw [mul_assoc,mul_left_inv] at h,
+  exact h,
+end
+
+lemma uniq_inv (a x:G) (h: x*a=1): x=a⁻¹:=
+begin
+  rw [←mul_one x, ←mul_right_inv a, ←mul_assoc, h, one_mul]
+end
 
 theorem mul_inv_rev (a b : G) : (a * b)⁻¹ = b⁻¹ * a ⁻¹ :=
-sorry
+begin
+  symmetry,
+  apply uniq_inv,
+  rw [← mul_assoc, mul_assoc b⁻¹ a⁻¹ a, mul_left_inv, mul_one, mul_left_inv]
+end
 
 end my_group
 end
