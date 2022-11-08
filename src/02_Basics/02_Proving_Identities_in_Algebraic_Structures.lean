@@ -60,29 +60,49 @@ by rw [←add_assoc, add_left_neg, zero_add]
 /- Prove these: -/
 
 theorem add_neg_cancel_right (a b : R) : (a + b) + -b = a :=
-sorry
+begin
+  rw add_comm,
+  rw add_comm a b,
+  rw neg_add_cancel_left,
+end
 
 theorem add_left_cancel {a b c : R} (h : a + b = a + c) : b = c :=
-sorry
+begin
+  rw ← neg_add_cancel_left a b,
+  rw ← neg_add_cancel_left a c,
+  rw h,
+end
 
 theorem add_right_cancel {a b c : R} (h : a + b = c + b) : a = c :=
-sorry
+  begin
+    rw ←  add_neg_cancel_right a b,
+    rw ←  add_neg_cancel_right c b,
+    rw ← h,
+  end
 
 theorem mul_zero (a : R) : a * 0 = 0 :=
 begin
   have h : a * 0 + a * 0 = a * 0 + 0,
   { rw [←mul_add, add_zero, add_zero] },
-  rw add_left_cancel h
+  rw add_left_cancel h,
 end
 
 theorem zero_mul (a : R) : 0 * a = 0 :=
-sorry
+begin
+  have h : 0 * a + 0 * a = 0 * a + 0,
+  { rw [←add_mul, add_zero, add_zero] },
+  rw add_left_cancel h,
+end
 
 theorem neg_eq_of_add_eq_zero {a b : R} (h : a + b = 0) : -a = b :=
-sorry
+by rw [←neg_add_cancel_left a b, h, add_zero]
 
 theorem eq_neg_of_add_eq_zero {a b : R} (h : a + b = 0) : a = -b :=
-sorry
+begin
+  symmetry,
+  apply neg_eq_of_add_eq_zero,
+  rw [add_comm, h],
+end
 
 theorem neg_zero : (-0 : R) = 0 :=
 begin
@@ -91,7 +111,10 @@ begin
 end
 
 theorem neg_neg (a : R) : -(-a) = a :=
-sorry
+begin
+  apply neg_eq_of_add_eq_zero,
+  rw add_left_neg,
+end
 
 end my_ring
 
@@ -109,7 +132,7 @@ example (a b : ℝ) : a - b = a + -b :=
 rfl
 
 example (a b : ℝ) : a - b = a + -b :=
-by reflexivity
+by refl
 
 namespace my_ring
 
@@ -131,6 +154,7 @@ variables (A : Type*) [add_group A]
 
 #check (add_assoc : ∀ a b c : A, a + b + c = a + (b + c))
 #check (zero_add : ∀ a : A, 0 + a = a)
+#check (mul_assoc : ∀ a b c : A, a * b * c = a * (b * c))
 #check (add_left_neg : ∀ a : A, -a + a = 0)
 end
 
