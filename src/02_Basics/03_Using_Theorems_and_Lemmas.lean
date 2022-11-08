@@ -55,7 +55,11 @@ le_refl x
 example (h₀ : a ≤ b) (h₁ : b < c) (h₂ : c ≤ d)
     (h₃ : d < e) :
   a < e :=
-sorry
+begin
+  apply lt_of_le_of_lt h₀,
+  apply lt_trans h₁,
+  exact lt_of_le_of_lt h₂ h₃,
+end
 
 example (h₀ : a ≤ b) (h₁ : b < c) (h₂ : c ≤ d)
     (h₃ : d < e) :
@@ -88,11 +92,13 @@ by linarith [exp_le_exp.mpr h']
 #check (add_pos_of_pos_of_nonneg : 0 < a → 0 ≤ b → 0 < a + b)
 #check (exp_pos : ∀ a, 0 < exp a)
 
+#check add_le_add_left
 #check @add_le_add_left
+
 example (h : a ≤ b) : exp a ≤ exp b :=
 begin
   rw exp_le_exp,
-  exact h
+  exact h,
 end
 
 example (h₀ : a ≤ b) (h₁ : c < d) : a + exp c + e < b + exp d + e :=
@@ -100,12 +106,20 @@ begin
   apply add_lt_add_of_lt_of_le,
   { apply add_lt_add_of_le_of_lt h₀,
     apply exp_lt_exp.mpr h₁ },
-  apply le_refl
+  apply le_refl,
 end
 
 example (h₀ : d ≤ e) : c + exp (a + d) ≤ c + exp (a + e) :=
 begin
-  sorry
+  /- /- apply add_le_add, -/ -/
+  /- /- {apply le_refl}, -/ -/
+  /- apply add_le_add_left, -/
+  /-  -/
+  /- rw exp_le_exp, -/
+  /- apply add_le_add_left h₀, -/
+  have: exp (a + d) ≤ exp (a + e),
+  {rw exp_le_exp, linarith},
+  linarith,
 end
 
 example : (0 : ℝ) < 1 :=
@@ -114,21 +128,25 @@ by norm_num
 example (h : a ≤ b) : log (1 + exp a) ≤ log (1 + exp b) :=
 begin
   have h₀ : 0 < 1 + exp a,
-  { sorry },
+  { linarith [exp_pos a]  },
   have h₁ : 0 < 1 + exp b,
-  { sorry },
+  { linarith [exp_pos b]  },
   apply (log_le_log h₀ h₁).mpr,
-  sorry
+  apply add_le_add_left,
+  apply exp_le_exp.mpr h,
 end
 
     example : 0 ≤ a^2 :=
     begin
-      -- library_search,
-      exact pow_two_nonneg a
+      /- library_search, -/
+      /- suggest, -/
+      exact sq_nonneg a,
     end
 
 example (h : a ≤ b) : c - exp b ≤ c - exp a :=
-  sorry
+begin
+  linarith [exp_le_exp.mpr h],
+end
 
 example : 2*a*b ≤ a^2 + b^2 :=
 begin
@@ -148,12 +166,43 @@ begin
   have h : 0 ≤ a^2 - 2*a*b + b^2,
   calc
     a^2 - 2*a*b + b^2 = (a - b)^2 : by ring
+    ... ≥ 0                       : by apply sq_nonneg,
+  linarith,
+end
+
+lemma fact1 : a*b*2 ≤ a^2 + b^2 :=
+begin
+  have h : 0 ≤ a^2 - 2*a*b + b^2,
+  calc
+    a^2 - 2*a*b + b^2 = (a - b)^2 : by ring
     ... ≥ 0                       : by apply pow_two_nonneg,
   linarith
 end
 
+lemma fact2 : -(a*b)*2 ≤ a^2 + b^2 :=
+begin
+  have h : 0 ≤ a^2 + 2*a*b + b^2,
+  calc
+    a^2 + 2*a*b + b^2 = (a + b)^2 : by ring
+    ... ≥ 0                       : by apply pow_two_nonneg,
+  linarith
+end
+
+lemma fact3 : (0 : ℝ) < 2 :=
+by norm_num
+
 example : abs (a*b) ≤ (a^2 + b^2) / 2 :=
-sorry
+begin
+  apply abs_le'.mpr,
+  rw [
+      le_div_iff fact3,
+      le_div_iff fact3
+    ],
+  split,
+  apply fact1,
+  apply fact2,
+end
 
 #check abs_le'.mpr
 
+#check le_div_iff
