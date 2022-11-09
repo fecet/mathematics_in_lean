@@ -194,10 +194,7 @@ by norm_num
 example : abs (a*b) ≤ (a^2 + b^2) / 2 :=
 begin
   apply abs_le'.mpr,
-  rw [
-      le_div_iff fact3,
-      le_div_iff fact3
-    ],
+  repeat {rw le_div_iff fact3},
   split,
   apply fact1,
   apply fact2,
