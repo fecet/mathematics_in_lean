@@ -33,13 +33,13 @@ variables x y z : α
 #check (le_sup_right: y ≤ x ⊔ y)
 #check (sup_le : x ≤ z → y ≤ z → x ⊔ y ≤ z)
 
-example : x ⊓ y = y ⊓ x := sorry
-example : x ⊓ y ⊓ z = x ⊓ (y ⊓ z) := sorry
-example : x ⊔ y = y ⊔ x := sorry
-example : x ⊔ y ⊔ z = x ⊔ (y ⊔ z) := sorry
+example : x ⊓ y = y ⊓ x := by finish
+example : x ⊓ y ⊓ z = x ⊓ (y ⊓ z) := by finish
+example : x ⊔ y = y ⊔ x := by finish
+example : x ⊔ y ⊔ z = x ⊔ (y ⊔ z) := by finish
 
-theorem absorb1 : x ⊓ (x ⊔ y) = x := sorry
-theorem absorb2 : x ⊔ (x ⊓ y) = x := sorry
+theorem absorb1 : x ⊓ (x ⊔ y) = x := by finish
+theorem absorb2 : x ⊔ (x ⊓ y) = x := by finish
 
 end
 
@@ -60,12 +60,15 @@ variables a b c : α
 
 example (h : ∀ x y z : α, x ⊓ (y ⊔ z) = (x ⊓ y) ⊔ (x ⊓ z)) :
   a ⊔ (b ⊓ c) = (a ⊔ b) ⊓ (a ⊔ c) :=
-sorry
+begin
+  rw [h, @inf_comm _ _ (a ⊔ b), absorb1, @inf_comm _ _ (a ⊔ b), h,
+    ←sup_assoc, @inf_comm _ _ c a, absorb2, inf_comm],
+end
 
 example (h : ∀ x y z : α, x ⊔ (y ⊓ z) = (x ⊔ y) ⊓ (x ⊔ z)) :
   a ⊓ (b ⊔ c) = (a ⊓ b) ⊔ (a ⊓ c) :=
-sorry
-
+by rw [h, @sup_comm _ _ (a ⊓ b), absorb2, @sup_comm _ _ (a ⊓ b), h,
+    ←inf_assoc, @sup_comm _ _ c a, absorb1, sup_comm]
 end
 
 section
@@ -77,11 +80,27 @@ variables a b c : R
 
 #check (mul_nonneg : 0 ≤ a → 0 ≤ b → 0 ≤ a * b)
 
-example : a ≤ b → 0 ≤ b - a := sorry
+lemma aux1: a ≤ b → 0 ≤ b - a := 
+begin
+  intro h,
+  rw [←sub_self a, sub_eq_add_neg, sub_eq_add_neg, add_comm, add_comm b],
+  apply add_le_add_left h,
+end
 
-example : 0 ≤ b - a → a ≤ b := sorry
+lemma aux2: 0 ≤ b - a → a ≤ b :=
+begin
+  intro h,
+  rw [←add_zero a, ←sub_add_cancel b a, add_comm (b - a)],
+  apply add_le_add_left h,
+end
 
-example (h : a ≤ b) (h' : 0 ≤ c) : a * c ≤ b * c := sorry
+example (h : a ≤ b) (h' : 0 ≤ c) : a * c ≤ b * c :=
+begin
+  have h1 : 0 ≤ (b - a) * c,
+  { exact mul_nonneg (aux1 _ _ h) h' },
+  rw sub_mul at h1,
+  exact aux2 _ _ h1,
+end
 
 end
 
@@ -93,7 +112,13 @@ variables x y z : X
 #check (dist_comm x y : dist x y = dist y x)
 #check (dist_triangle x y z : dist x z ≤ dist x y + dist y z)
 
-example (x y : X) : 0 ≤ dist x y := sorry
+example (x y : X) : 0 ≤ dist x y := 
+begin
+  have : 0 ≤ dist x y + dist y x,
+    { rw [←dist_self x],
+      apply dist_triangle, },
+    linarith [dist_comm x y],
+end
 
 end
 
